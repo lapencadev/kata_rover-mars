@@ -20,4 +20,12 @@ public class Rover {
     public void turnRight(){
         this.direction = this.direction.right();
     }
+
+    public void move() {
+        this.position.move(this.direction);
+    }
+
+    public Position getPosition() {
+        return position;
+    }
 }

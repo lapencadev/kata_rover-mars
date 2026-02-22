@@ -8,4 +8,21 @@ public class Position {
         this.x = x;
         this.y = y;
     }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void move(Direction direction) {
+        switch (direction) {
+            case N -> this.y += 1;
+            case E -> this.x += 1;
+            case S -> this.y -= 1;
+            case W -> this.x -= 1;
+        }
+    }
 }
