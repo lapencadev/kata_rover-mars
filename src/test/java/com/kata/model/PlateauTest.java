@@ -1,5 +1,5 @@
-import com.kata.model.Plateau;
-import com.kata.model.Position;
+package com.kata.model;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;

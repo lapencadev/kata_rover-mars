@@ -1,6 +1,5 @@
-import com.kata.model.Direction;
-import com.kata.model.Position;
-import com.kata.model.Rover;
+package com.kata.model;
+
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
