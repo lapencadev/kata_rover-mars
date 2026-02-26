@@ -1,43 +1,75 @@
 package com.kata.service;
 
+import com.kata.exception.InvalidCommandException;
+import com.kata.exception.InvalidMissionInputException;
+import com.kata.exception.PositionOutOfBoundsException;
 import com.kata.model.Direction;
 import com.kata.model.Plateau;
 import com.kata.model.Position;
 import com.kata.model.Rover;
 
 public class MissionControlService {
-    public String executeMission(String inputNASA) {
-        String[] lines = inputNASA.split("\\r?\\n");
-        if (lines.length == 0) return "";
+    private static final String ERR_MISSING_COMMANDS = "Missing rover commands";
+    private static final String ERR_INVALID_POSITION = "Invalid rover starting position";
+    private static final String ERR_OUT_OF_BOUNDS = "Rover moved out of bounds";
 
-        String[] plateauParts = lines[0].trim().split(" ");
-        int width = Integer.parseInt(plateauParts[0]);
-        int height = Integer.parseInt(plateauParts[1]);
-        Plateau plateau = new Plateau(width, height);
+    public String executeMission(String inputNASA) {
+        if (inputNASA == null || inputNASA.isBlank()) {
+            throw new InvalidMissionInputException("Mission input cannot be empty");
+        }
+
+        inputNASA = inputNASA.toUpperCase();
+
+        String[] lines = inputNASA.split("\\r?\\n");
+        if (lines.length < 1) {
+            throw new InvalidMissionInputException("Missing plateau configuration");
+        }
 
         StringBuilder output = new StringBuilder();
 
-        for (int i = 1; i < lines.length; i += 2) {
-            String startPosition = lines[i].trim();
-            String commands = lines[i + 1].trim();
+        try {
+            String[] plateauParts = lines[0].trim().split("\\s+");
+            int width = Integer.parseInt(plateauParts[0]);
+            int height = Integer.parseInt(plateauParts[1]);
+            Plateau plateau = new Plateau(width, height);
 
-            String roverResult = processRover(plateau, startPosition, commands);
-            output.append(roverResult);
-            if (i + 2 < lines.length) {
-                output.append("\n");
+            for (int i = 1; i < lines.length; i += 2) {
+                if (i + 1 >= lines.length) {
+                    throw new InvalidMissionInputException(ERR_MISSING_COMMANDS);
+                }
+                String startPosition = lines[i].trim();
+                String commands = lines[i + 1].trim();
+
+                String roverResult = processRover(plateau, startPosition, commands);
+                output.append(roverResult);
+                if (i + 2 < lines.length) {
+                    output.append("\n");
+                }
             }
-
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+            throw new InvalidMissionInputException("Invalid plateau format");
         }
         return output.toString();
     }
 
     private String processRover(Plateau plateau, String startPosition, String commands) {
-        String[] parts = startPosition.split(" ");
-        int x = Integer.parseInt(parts[0]);
-        int y = Integer.parseInt(parts[1]);
-        Direction direction = Direction.valueOf(parts[2]);
+        String[] parts = startPosition.split("\\s+");
+        if (parts.length != 3) throw new InvalidMissionInputException(ERR_INVALID_POSITION);
 
-        Rover rover = new Rover(new Position(x, y), direction);
+        Rover rover;
+        try {
+            int x = Integer.parseInt(parts[0]);
+            int y = Integer.parseInt(parts[1]);
+            Direction direction = Direction.valueOf(parts[2]);
+            rover = new Rover(new Position(x, y), direction);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidMissionInputException(ERR_INVALID_POSITION);
+        }
+
+
+        if (!plateau.isWithinBounds(rover.getPosition())) {
+            throw new PositionOutOfBoundsException(ERR_OUT_OF_BOUNDS);
+        }
 
         for (char command : commands.toCharArray()) {
             switch (command) {
@@ -46,9 +78,10 @@ public class MissionControlService {
                 case 'M' -> {
                     rover.move();
                     if (!plateau.isWithinBounds(rover.getPosition())) {
-                        throw new IllegalStateException("Rover moved out of bounds");
+                        throw new PositionOutOfBoundsException(ERR_OUT_OF_BOUNDS);
                     }
                 }
+                default -> throw new InvalidCommandException("Unknown command: " + command);
             }
         }
         return rover.getPosition().getX() + " " + rover.getPosition().getY() + " " + rover.getDirection();
