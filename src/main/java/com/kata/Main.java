@@ -5,7 +5,7 @@ import com.kata.service.MissionControlService;
 import java.util.Scanner;
 
 public class Main {
-    void main() {
+    public static void main(String[] args) {
         MissionControlService service = new MissionControlService();
         Scanner scanner = new Scanner(System.in);
 

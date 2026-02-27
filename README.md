@@ -36,3 +36,16 @@ You can run the Main class. It will wait for your input via console:
 2. Enter rover position (e.g., 1 2 N).
 3. Enter commands (e.g., LMLMLMLMM).
 4. Press Enter twice to see the result.
+
+## 🐳 Run with Docker (Recommended)
+You don't need Java 21 installed. Just run:
+> **Note**: Ensure [Docker Desktop](https://www.docker.com) is running before executing these commands.
+
+1. **Build the image**:
+   ```bash
+   docker build -t mars-rover-kata .
+    ```
+2. **Run the container**:
+    ```bash
+    docker run -it --rm mars-rover-kata
+    ```
