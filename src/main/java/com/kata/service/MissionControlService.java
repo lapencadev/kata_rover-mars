@@ -21,7 +21,7 @@ public class MissionControlService {
         inputNASA = inputNASA.toUpperCase();
 
         String[] lines = inputNASA.split("\\r?\\n");
-        if (lines.length < 1) {
+        if (lines[0].isBlank()) {
             throw new InvalidMissionInputException("Missing plateau configuration");
         }
 
@@ -29,6 +29,9 @@ public class MissionControlService {
 
         try {
             String[] plateauParts = lines[0].trim().split("\\s+");
+            if (plateauParts.length != 2) {
+                throw new InvalidMissionInputException("Invalid plateau format");
+            }
             int width = Integer.parseInt(plateauParts[0]);
             int height = Integer.parseInt(plateauParts[1]);
             Plateau plateau = new Plateau(width, height);
@@ -66,12 +69,16 @@ public class MissionControlService {
             throw new InvalidMissionInputException(ERR_INVALID_POSITION);
         }
 
-
         if (!plateau.isWithinBounds(rover.getPosition())) {
             throw new PositionOutOfBoundsException(ERR_OUT_OF_BOUNDS);
         }
 
-        for (char command : commands.toCharArray()) {
+        String normalizedCommands = commands.replaceAll("\\s+", "");
+        if (normalizedCommands.isEmpty()) {
+            throw new InvalidMissionInputException(ERR_MISSING_COMMANDS);
+        }
+
+        for (char command : normalizedCommands.toCharArray()) {
             switch (command) {
                 case 'L' -> rover.turnLeft();
                 case 'R' -> rover.turnRight();
