@@ -8,7 +8,7 @@ This is my implementation of the Mars Rover Kata. I focused on creating a clean,
 2.  **Logic separation**: I split the code into two main parts:
     *   **Model**: Where the "rules" of Mars live (Rover, Position, Direction, Plateau).
     *   **Services**: Orchestrates the mission, parsing NASA strings into domain objects.
-3.  **TDD (Test-Driven Development)**: I wrote tests before the actual logic to make sure the Rover turns and moves correctly without bugs, following a red-green-refactor cycle.
+3.  **TDD (Test-Driven Development)**: I wrote tests before the actual logic to make sure the Rover turns and moves correctly without bugs, following a red-green-refactor cycle. I later iterated with **JaCoCo** to spot untested branches and added the missing unit and integration tests to reach full coverage.
 4.  **Smart enums**: I used a Java `Enum` for Directions (N, E, S, W) so the logic for turning left or right stays inside the direction itself.
 
 ## 📂 Project Structure
@@ -26,19 +26,54 @@ src/test/java/com/kata      # Mirror structure for Unit & Integration tests
 
 The service takes the mission input, validates it, builds the models ensuring Plateau boundaries, and processes the rover commands step by step. It returns the rover's final state. Custom exceptions are used for invalid mission input and out-of-bounds errors.
 
+## 📥 Input format (validated)
+- First line: plateau size `X Y`.
+- Next lines in pairs: `x y D` and commands. Commands can be contiguous or spaced (e.g., `LMLMLMLMM` or `L M L M L M L M M`).
+- `EXIT` ends the interactive session. A blank line processes the current mission.
+
+Example (from the kata statement):
+```text
+5 5
+1 2 N
+L M L M L M L M M
+3 3 E
+M M R M M R M R R M
+```
+Output:
+```text
+1 3 N
+5 1 E
+```
+
+## ⚠️ Error handling
+- `InvalidMissionInputException`: empty input, malformed plateau or rover position, missing commands (including commands made only of spaces).
+- `InvalidCommandException`: any command different from L/R/M.
+- `PositionOutOfBoundsException`: rover starts or moves outside the plateau.
+
 ## 🚀 How to run the tests
 You can run all the tests using Maven:
-`mvn test`
+```bash
+mvn test
+```
+Generate coverage (JaCoCo):
+```bash
+mvn clean test jacoco:report
+```
 
 ## 🏃🏻‍♀️ Run Application
 You can run the Main class. It will wait for your input via console:
 1. Enter the plateau size (e.g., 5 5).
 2. Enter rover position (e.g., 1 2 N).
-3. Enter commands (e.g., LMLMLMLMM).
-4. Press Enter twice to see the result.
+3. Enter commands (e.g., `LMLMLMLMM` or `L M L M`).
+4. Press Enter twice to see the result, or type `EXIT` to quit.
+
+Run with Maven (no Docker):
+```bash
+mvn exec:java -Dexec.mainClass=com.kata.Main
+```
 
 ## 🐳 Run with Docker (Recommended)
-You don't need Java 21 installed. Just run:
+You don't need Java 25 installed. Just run:
 > **Note**: Ensure [Docker Desktop](https://www.docker.com) is running before executing these commands.
 
 1. **Build the image**:
