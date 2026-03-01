@@ -18,11 +18,10 @@ public class Position {
     }
 
     public void move(Direction direction) {
-        switch (direction) {
-            case N -> this.y += 1;
-            case E -> this.x += 1;
-            case S -> this.y -= 1;
-            case W -> this.x -= 1;
+        if (direction == null) {
+            throw new IllegalArgumentException("Direction cannot be null");
         }
+        this.x += direction.dx();
+        this.y += direction.dy();
     }
 }

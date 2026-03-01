@@ -1,7 +1,7 @@
 package com.kata.model;
 
 public class Rover {
-    private Position position;
+    private final Position position;
     private Direction direction;
 
     public Rover(Position position, Direction direction) {
