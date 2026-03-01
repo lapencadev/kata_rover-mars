@@ -3,6 +3,7 @@ package com.kata.model;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PositionTest {
     @Test
@@ -35,5 +36,11 @@ public class PositionTest {
         position.move(Direction.W);
         assertEquals(-1, position.getX());
         assertEquals(0, position.getY());
+    }
+
+    @Test
+    public void should_throw_when_direction_is_null() {
+        Position position = new Position(0, 0);
+        assertThrows(IllegalArgumentException.class, () -> position.move(null));
     }
 }

@@ -19,4 +19,32 @@ public class PlateauTest {
         Position outsidePosition = new Position(6, 6);
         assertFalse(plateau.isWithinBounds(outsidePosition));
     }
+
+    @Test
+    public void should_return_false_if_x_is_negative() {
+        Plateau plateau = new Plateau(5, 5);
+        Position position = new Position(-1, 3);
+        assertFalse(plateau.isWithinBounds(position));
+    }
+
+    @Test
+    public void should_return_false_if_y_is_negative() {
+        Plateau plateau = new Plateau(5, 5);
+        Position position = new Position(3, -1);
+        assertFalse(plateau.isWithinBounds(position));
+    }
+
+    @Test
+    public void should_return_false_if_y_exceeds_height() {
+        Plateau plateau = new Plateau(5, 5);
+        Position position = new Position(3, 6);
+        assertFalse(plateau.isWithinBounds(position));
+    }
+
+    @Test
+    public void should_return_false_if_x_exceeds_width() {
+        Plateau plateau = new Plateau(5, 5);
+        Position position = new Position(6, 3);
+        assertFalse(plateau.isWithinBounds(position));
+    }
 }
