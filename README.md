@@ -59,6 +59,7 @@ Generate coverage (JaCoCo):
 ```bash
 mvn clean test jacoco:report
 ```
+Open the report by loading `target/site/jacoco/index.html` in your browser (double-click the file in your file explorer or use your OS “open file” command).
 
 ## 🏃🏻‍♀️ Run Application
 You can run the Main class. It will wait for your input via console:

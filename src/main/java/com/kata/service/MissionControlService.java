@@ -14,43 +14,50 @@ public class MissionControlService {
     private static final String ERR_OUT_OF_BOUNDS = "Rover moved out of bounds";
 
     public String executeMission(String inputNASA) {
+        String[] lines = validateAndSplitInput(inputNASA);
+        try {
+            Plateau plateau = parsePlateau(lines[0]);
+            return processRovers(plateau, lines);
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+            throw new InvalidMissionInputException("Invalid plateau format");
+        }
+    }
+
+    private String[] validateAndSplitInput(String inputNASA) {
         if (inputNASA == null || inputNASA.isBlank()) {
             throw new InvalidMissionInputException("Mission input cannot be empty");
         }
-
-        inputNASA = inputNASA.toUpperCase();
-
-        String[] lines = inputNASA.split("\\r?\\n");
+        String[] lines = inputNASA.toUpperCase().split("\\r?\\n");
         if (lines[0].isBlank()) {
             throw new InvalidMissionInputException("Missing plateau configuration");
         }
+        return lines;
+    }
 
-        StringBuilder output = new StringBuilder();
-
-        try {
-            String[] plateauParts = lines[0].trim().split("\\s+");
-            if (plateauParts.length != 2) {
-                throw new InvalidMissionInputException("Invalid plateau format");
-            }
-            int width = Integer.parseInt(plateauParts[0]);
-            int height = Integer.parseInt(plateauParts[1]);
-            Plateau plateau = new Plateau(width, height);
-
-            for (int i = 1; i < lines.length; i += 2) {
-                if (i + 1 >= lines.length) {
-                    throw new InvalidMissionInputException(ERR_MISSING_COMMANDS);
-                }
-                String startPosition = lines[i].trim();
-                String commands = lines[i + 1].trim();
-
-                String roverResult = processRover(plateau, startPosition, commands);
-                output.append(roverResult);
-                if (i + 2 < lines.length) {
-                    output.append("\n");
-                }
-            }
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+    private Plateau parsePlateau(String plateauLine) {
+        String[] plateauParts = plateauLine.trim().split("\\s+");
+        if (plateauParts.length != 2) {
             throw new InvalidMissionInputException("Invalid plateau format");
+        }
+        int width = Integer.parseInt(plateauParts[0]);
+        int height = Integer.parseInt(plateauParts[1]);
+        return new Plateau(width, height);
+    }
+
+    private String processRovers(Plateau plateau, String[] lines) {
+        StringBuilder output = new StringBuilder();
+        for (int i = 1; i < lines.length; i += 2) {
+            if (i + 1 >= lines.length) {
+                throw new InvalidMissionInputException(ERR_MISSING_COMMANDS);
+            }
+            String startPosition = lines[i].trim();
+            String commands = lines[i + 1].trim();
+
+            String roverResult = processRover(plateau, startPosition, commands);
+            output.append(roverResult);
+            if (i + 2 < lines.length) {
+                output.append("\n");
+            }
         }
         return output.toString();
     }
