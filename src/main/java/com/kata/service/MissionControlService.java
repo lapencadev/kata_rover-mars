@@ -86,18 +86,30 @@ public class MissionControlService {
         }
 
         for (char command : normalizedCommands.toCharArray()) {
-            switch (command) {
-                case 'L' -> rover.turnLeft();
-                case 'R' -> rover.turnRight();
-                case 'M' -> {
-                    rover.move();
-                    if (!plateau.isWithinBounds(rover.getPosition())) {
-                        throw new PositionOutOfBoundsException(ERR_OUT_OF_BOUNDS);
-                    }
-                }
-                default -> throw new InvalidCommandException("Unknown command: " + command);
-            }
+            executeCommand(rover, plateau, command);
         }
         return rover.getPosition().getX() + " " + rover.getPosition().getY() + " " + rover.getDirection();
+    }
+
+    private void executeCommand(Rover rover, Plateau plateau, char command) {
+        switch (command) {
+            case 'L' -> rover.turnLeft();
+            case 'R' -> rover.turnRight();
+            case 'M' -> {
+                Position nextPosition = calculateNextPosition(rover);
+                if (!plateau.isWithinBounds(nextPosition)) {
+                    throw new PositionOutOfBoundsException(ERR_OUT_OF_BOUNDS);
+                }
+                rover.move();
+            }
+            default -> throw new InvalidCommandException("Unknown command: " + command);
+        }
+    }
+
+    private Position calculateNextPosition(Rover rover) {
+        Direction direction = rover.getDirection();
+        int nextX = rover.getPosition().getX() + direction.dx();
+        int nextY = rover.getPosition().getY() + direction.dy();
+        return new Position(nextX, nextY);
     }
 }
